@@ -189,6 +189,7 @@ var Lang = (function () {
 	/**
 	 * Scans the DOM for elements with [lang] selector and saves translate data
 	 * for them for later use.
+	 * adds unique ID for each element based on [lang-token] attr
 	 * @private
 	 */
 	Lang.prototype._start = function (selector) {
@@ -197,9 +198,23 @@ var Lang = (function () {
 			arrCount = arr.length,
 			elem;
 
+		var n = 0;
+
 		while (arrCount--) {
 			elem = $(arr[arrCount]);
 			this._processElement(elem);
+
+			//add unique ID to each
+			var foo = elem.attr("data-lang-token"); // will return the string "123"
+
+			elem[0].id = "lang-"+foo;
+
+
+			// document.querySelector(elem[]).id = 'y'+n;
+			
+			n++;
+			
+
 		}
 	};
 	
@@ -288,7 +303,10 @@ var Lang = (function () {
 			nodeObj = {
 				node : node,
 				langDefaultText : node.data
+
 			};
+
+			console.log(nodeObj);
 
 			nodeObjArray.push(nodeObj);
 		});
@@ -322,15 +340,21 @@ var Lang = (function () {
 			if (langNotDefault) {
 				// If langToken is set, use it as a token
 				defaultText = textNode.langToken || $.trim(textNode.langDefaultText);
-				
+
+
 				if (defaultText) {
 					// Translate the langDefaultText
 					translation = this.translate(defaultText, lang);
-					
+
 					if (translation) {
 						try {
 							// Replace the text with the translated version
-							textNode.node.data = textNode.node.data.split($.trim(textNode.node.data)).join(translation);
+							// textNode.node.data = textNode.node.data.split($.trim(textNode.node.data)).join(translation);
+
+							var foo = document.getElementById('lang-'+textNode.langToken);
+
+							foo.innerHTML=translation;
+
 						} catch (e) {
 							
 						}
@@ -343,7 +367,11 @@ var Lang = (function () {
 			} else {
 				// Replace with original text
 				try {
-					textNode.node.data = textNode.langDefaultText;
+					
+					// textNode.node.data = textNode.langDefaultText;
+					var foo = document.getElementById('lang-'+textNode.langToken);
+					foo.innerHTML=textNode.langDefaultText;
+					
 				} catch (e) {
 					
 				}
@@ -374,10 +402,12 @@ var Lang = (function () {
 						if (translation) {
 							// Change the attribute to the translated value
 							elem.attr(attr, translation);
+
 						}
 					} else {
 						// Set default language value
 						elem.attr(attr, attrObj[attr]);
+
 					}
 				}
 			}
