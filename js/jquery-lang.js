@@ -198,23 +198,15 @@ var Lang = (function () {
 			arrCount = arr.length,
 			elem;
 
-		var n = 0;
-
 		while (arrCount--) {
 			elem = $(arr[arrCount]);
 			this._processElement(elem);
 
-			//add unique ID to each
-			var foo = elem.attr("data-lang-token"); // will return the string "123"
+			//add unique ID to each object so that we can target them without the slow down of targetting the data-attr
+			var id = elem.attr("data-lang-token");
 
-			elem[0].id = "lang-"+foo;
-
-
-			// document.querySelector(elem[]).id = 'y'+n;
+			elem[0].id = "lang-"+id;
 			
-			n++;
-			
-
 		}
 	};
 	
@@ -302,11 +294,10 @@ var Lang = (function () {
 
 			nodeObj = {
 				node : node,
-				langDefaultText : node.data
+				langDefaultText : node.data //This is a problem - the data attr is only text - want to get the HTML but I don't know how.
+
 
 			};
-
-			console.log(nodeObj);
 
 			nodeObjArray.push(nodeObj);
 		});
@@ -349,11 +340,11 @@ var Lang = (function () {
 					if (translation) {
 						try {
 							// Replace the text with the translated version
-							// textNode.node.data = textNode.node.data.split($.trim(textNode.node.data)).join(translation);
+							var textchange = document.getElementById('lang-'+textNode.langToken);
 
-							var foo = document.getElementById('lang-'+textNode.langToken);
+							//target ID instead of data-attr because faster 
 
-							foo.innerHTML=translation;
+							textchange.innerHTML=translation; //simply switch it out using innerHTML which keeps <br/> and <p> elements from the JSON file.
 
 						} catch (e) {
 							
@@ -369,8 +360,8 @@ var Lang = (function () {
 				try {
 					
 					// textNode.node.data = textNode.langDefaultText;
-					var foo = document.getElementById('lang-'+textNode.langToken);
-					foo.innerHTML=textNode.langDefaultText;
+					var textchange = document.getElementById('lang-'+textNode.langToken);
+					textchange.innerHTML=textNode.langDefaultText;
 					
 				} catch (e) {
 					
